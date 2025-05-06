@@ -38,10 +38,17 @@ jobs:
           role-to-assume: arn:aws:iam::870424520169:role/gh-test-iam-odic
           aws-region: us-east-1
 
+      - name: find aws env vars
+        uses: actions/github-script@v7
+        with:
+          script: |
+            Object.entries(process.env)
+            .filter(([key, value]) => key.startsWith('AWS'))
+            .forEach(([key, value]) => console.log(`${key}=${value}(${value.length})`))
+
       - name: test aws creds
         run: |
           aws sts get-caller-identity
-          echo "$AWS_REGION - $AWS_ACCESS_KEY_ID - $AWS_SECRET_ACCESS_KEY"
       - run: pnpx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --with-env-vars="AWS_REGION,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY" --stop-agents-after="e2e-ci"
       - run: pnpm install --frozen-lockfile
       - run: pnpx playwright install --with-deps
