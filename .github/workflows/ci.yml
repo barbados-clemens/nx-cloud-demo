@@ -7,6 +7,7 @@ on:
   pull_request:
 
 permissions:
+  id-token: write
   actions: read
   contents: read
 
@@ -31,7 +32,17 @@ jobs:
           node-version: 20
           cache: 'pnpm'
       - run: corepack enable
-      - run: pnpx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e-ci"
+      - name: auth aws
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::870424520169:role/gh-test-iam-odic
+          aws-region: us-east-1
+
+      - name: test aws creds
+        run: |
+          aws sts get-caller-identity
+          echo "$AWS_REGION - $AWS_ACCESS_KEY_ID - $AWS_SECRET_ACCESS_KEY"
+      - run: pnpx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --with-env-vars="AWS_REGION,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY" --stop-agents-after="e2e-ci"
       - run: pnpm install --frozen-lockfile
       - run: pnpx playwright install --with-deps
       - uses: nrwl/nx-set-shas@v4
