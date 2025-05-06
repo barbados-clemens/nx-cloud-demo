@@ -49,7 +49,7 @@ jobs:
       - name: test aws creds
         run: |
           aws sts get-caller-identity
-      - run: pnpx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --with-env-vars="AWS_REGION,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY" --stop-agents-after="e2e-ci"
+      - run: pnpx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --with-env-vars="AWS_REGION,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_SESSION_TOKEN" --stop-agents-after="e2e-ci"
       - run: pnpm install --frozen-lockfile
       - run: pnpx playwright install --with-deps
       - uses: nrwl/nx-set-shas@v4
